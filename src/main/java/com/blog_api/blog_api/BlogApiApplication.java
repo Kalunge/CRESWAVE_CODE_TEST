@@ -11,4 +11,3 @@ public class BlogApiApplication {
     }
 
 }
-//docker run -d --name mysql-container -e MYSQL_ROOT_PASSWORD=blog_db_password -e MYSQL_DATABASE=blog_db -p 3306:3306 mysql:latest
