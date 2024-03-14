@@ -2,6 +2,7 @@ package com.blog_api.blog_api.controller;
 
 import com.blog_api.blog_api.entity.Post;
 import com.blog_api.blog_api.service.PostService;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ public class PostController {
     public ResponseEntity<Post> getPostById(@PathVariable("id") long postId) {
         Post post = postService.findById(postId);
         return new ResponseEntity<>(post, HttpStatus.OK);
+
     }
 
     @DeleteMapping("/{id}")
@@ -47,8 +49,11 @@ public class PostController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Post> editPost(@PathVariable("id") long postId, @RequestBody Post post) {
-        Post updatePost = postService.editPost(postId, post);
-
-        return new ResponseEntity<>(updatePost, HttpStatus.OK);
+        try {
+            Post updatePost = postService.editPost(postId, post);
+            return new ResponseEntity<>(updatePost, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

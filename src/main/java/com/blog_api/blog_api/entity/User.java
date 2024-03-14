@@ -7,22 +7,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "users")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Post {
+public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String title;
+    @Column(nullable = false, unique = true)
+    private String username;
 
     @Column(nullable = false)
-    private String content;
+    private String password;
 
-    @Column(name = "author_id")
-    private Long authorId;
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String role;
 }

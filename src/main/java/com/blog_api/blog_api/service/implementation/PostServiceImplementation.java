@@ -37,8 +37,7 @@ public class PostServiceImplementation implements PostService {
     @Override
     public Post findById(Long postId) {
 //        log.info("Get the Post for postId: " + postId);
-        Post post = postRepository.findById(postId).orElseThrow(() -> new PostException("Post with the given id could not be found", "POST_NOT_FOUND"));
-        return post;
+        return postRepository.findById(postId).orElseThrow(() -> new PostException("Post with the given id could not be found", "POST_NOT_FOUND"));
     }
 
     @Override
@@ -52,7 +51,6 @@ public class PostServiceImplementation implements PostService {
         Post postToEdit = postRepository.findById(postId).orElseThrow(() -> new PostException("Post does not exist with the given Id", "NOT_FOUND"));
         postToEdit.setContent(post.getContent());
         postToEdit.setTitle(postToEdit.getTitle());
-
         return postRepository.save(postToEdit);
     }
 }
