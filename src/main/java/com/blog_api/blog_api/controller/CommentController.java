@@ -1,8 +1,11 @@
 package com.blog_api.blog_api.controller;
 
+import com.blog_api.blog_api.dto.CommentDto;
+import com.blog_api.blog_api.dto.CommentNotFoundResponse;
 import com.blog_api.blog_api.entity.Comment;
 import com.blog_api.blog_api.entity.Post;
 import com.blog_api.blog_api.exception.CommentException;
+import com.blog_api.blog_api.exception.CommentNotFoundException;
 import com.blog_api.blog_api.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/posts/{postId}/comments")
@@ -32,24 +36,28 @@ public class CommentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Comment> getPostById(@PathVariable("id") long commentId) {
-        Comment comment = commentService.findById(commentId);
-        return new ResponseEntity<>(comment, HttpStatus.OK);
+    public ResponseEntity<?> getCommentById(@PathVariable("postId") long postId, @PathVariable("id") long commentId) {
+        try {
+            Optional<Comment> comment = commentService.findById(postId, commentId);
+            return new ResponseEntity<>(comment, HttpStatus.OK);
+        } catch (CommentNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CommentNotFoundResponse("Comment not found", postId, commentId));
+        }
 
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Boolean>> deleteComment(@PathVariable("id") long commentId) {
-        commentService.deleteComment(commentId);
+    public ResponseEntity<Map<String, Boolean>> deleteComment(@PathVariable("postId") long postId, @PathVariable("id") long commentId) {
+        commentService.deleteComment(postId, commentId);
         Map<String, Boolean> response = new HashMap<>();
         response.put("Deleted", true);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Comment> editComment(@PathVariable("id") long commentId, @RequestBody Comment comment) {
+    public ResponseEntity<Comment> editComment(@PathVariable("postId") long postId, @PathVariable("id") long commentId, @RequestBody Comment comment) {
         try {
-            Comment updateComment = commentService.editComment(commentId, comment);
+            Comment updateComment = commentService.editComment(postId, commentId, comment);
             return new ResponseEntity<>(updateComment, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
