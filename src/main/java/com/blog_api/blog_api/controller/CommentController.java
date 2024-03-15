@@ -26,8 +26,8 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Comment>> getAllPosts() {
-        List<Comment> comments = commentService.getAllComments();
+    public ResponseEntity<List<Comment>> getAllPosts(@PathVariable Long postId) {
+        List<Comment> comments = commentService.getAllComments(postId);
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 

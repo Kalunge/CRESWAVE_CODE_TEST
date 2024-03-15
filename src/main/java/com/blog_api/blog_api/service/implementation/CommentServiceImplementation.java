@@ -37,8 +37,8 @@ public class CommentServiceImplementation implements CommentService {
     }
 
     @Override
-    public List<Comment> getAllComments() {
-        return commentRepository.findAll();
+    public List<Comment> getAllComments(Long postId) {
+        return commentRepository.findByPostId(postId);
     }
 
 
