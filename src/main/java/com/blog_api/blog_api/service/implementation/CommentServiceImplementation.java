@@ -1,8 +1,11 @@
 package com.blog_api.blog_api.service.implementation;
 
 import com.blog_api.blog_api.entity.Comment;
+import com.blog_api.blog_api.entity.Post;
 import com.blog_api.blog_api.exception.CommentException;
+import com.blog_api.blog_api.exception.PostException;
 import com.blog_api.blog_api.repository.CommentRepository;
+import com.blog_api.blog_api.repository.PostRepository;
 import com.blog_api.blog_api.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,12 +14,26 @@ import java.util.List;
 
 @Service
 public class CommentServiceImplementation implements CommentService {
-    @Autowired
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
+
+    public CommentServiceImplementation(CommentRepository commentRepository, PostRepository postRepository) {
+        this.commentRepository = commentRepository;
+        this.postRepository = postRepository;
+    }
 
     @Override
-    public Comment createComment(Comment comment) {
-        return commentRepository.save(comment);
+    public Comment createComment(Long postId, Comment comment) {
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new PostException("No post found with the given ID", "NOT_FOUND"));
+
+        Comment commentToSave = Comment.builder()
+                .content(comment.getContent())
+                .postId(post.getId())
+                .userId(comment.getUserId())
+                .build();
+
+        return commentRepository.save(commentToSave);
     }
 
     @Override

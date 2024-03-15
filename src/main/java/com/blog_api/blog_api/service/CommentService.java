@@ -6,7 +6,7 @@ import com.blog_api.blog_api.entity.Post;
 import java.util.List;
 
 public interface CommentService {
-    Comment createComment(Comment comment);
+    Comment createComment(Long postId, Comment comment);
 
     List<Comment> getAllComments();
 

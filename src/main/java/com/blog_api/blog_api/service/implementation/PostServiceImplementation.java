@@ -15,8 +15,11 @@ import java.util.List;
 @Log4j
 public class PostServiceImplementation implements PostService {
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
+
+    public PostServiceImplementation(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
 
     @Override
@@ -36,7 +39,7 @@ public class PostServiceImplementation implements PostService {
 
     @Override
     public Post findById(Long postId) {
-//        log.info("Get the Post for postId: " + postId);
+        log.info("Get the Post for postId: " + postId);
         return postRepository.findById(postId).orElseThrow(() -> new PostException("Post with the given id could not be found", "POST_NOT_FOUND"));
     }
 
