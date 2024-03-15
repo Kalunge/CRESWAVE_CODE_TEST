@@ -2,9 +2,11 @@ package com.blog_api.blog_api.controller;
 
 import com.blog_api.blog_api.dto.LoginRequest;
 import com.blog_api.blog_api.dto.LoginResponse;
+import com.blog_api.blog_api.dto.UserDto;
 import com.blog_api.blog_api.entity.Post;
 import com.blog_api.blog_api.entity.User;
 import com.blog_api.blog_api.service.UserService;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@Log4j
 public class UserController {
 
     @Autowired
@@ -61,12 +64,12 @@ public class UserController {
 //  TODO   GET /api/users/profile
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getProfile(@PathVariable("id") Long userId) {
+    public ResponseEntity<UserDto> getProfile(@PathVariable("id") Long userId) {
         try {
-            User user = userService.getProfile(userId);
+            UserDto user = userService.getProfile(userId);
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
-            // TODO log error
+            log.info(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

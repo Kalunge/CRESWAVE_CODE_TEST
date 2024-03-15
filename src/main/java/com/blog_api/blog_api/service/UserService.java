@@ -2,6 +2,7 @@ package com.blog_api.blog_api.service;
 
 import com.blog_api.blog_api.dto.LoginRequest;
 import com.blog_api.blog_api.dto.LoginResponse;
+import com.blog_api.blog_api.dto.UserDto;
 import com.blog_api.blog_api.entity.User;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface UserService {
     LoginResponse login(LoginRequest request);
 
     //  TODO   GET /api/users/profile
-    User getProfile(Long userId);
+    UserDto getProfile(Long userId);
 
     //  TODO  PUT /api/users/profile
     User editProfile(Long userId, User user);
