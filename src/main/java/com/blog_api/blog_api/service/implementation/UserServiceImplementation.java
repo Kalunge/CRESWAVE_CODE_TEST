@@ -9,13 +9,13 @@ import com.blog_api.blog_api.exception.UserException;
 import com.blog_api.blog_api.repository.PostRepository;
 import com.blog_api.blog_api.repository.UserRepository;
 import com.blog_api.blog_api.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Log4j
 public class UserServiceImplementation implements UserService {
 
     private final UserRepository userRepository;
@@ -28,12 +28,22 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        try {
+            return userRepository.findAll();
+        } catch (Exception e) {
+            log.error("Failed to retrieve all users: " + e.getMessage());
+            throw new UserException("Failed to retrieve all users", e.getMessage());
+        }
     }
 
     @Override
     public User register(User user) {
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (Exception e) {
+            log.error("Failed to register user: " + e.getMessage());
+            throw new UserException("Failed to register user", e.getMessage());
+        }
     }
 
     @Override
@@ -45,29 +55,39 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public UserDto getProfile(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserException("User with the given id could not be found", "USER_NOT_FOUND"));
-        List<Post> userPosts = postRepository.findByAuthorId(userId);
-
-        UserDto userDto = UserDto.builder().email(user.getEmail()).posts(userPosts).role(user.getRole()).username(user.getUsername()).build();
-
-        return userDto;
+        try {
+            User user = userRepository.findById(userId).orElseThrow(() -> new UserException("User with the given ID could not be found", "USER_NOT_FOUND"));
+            List<Post> userPosts = postRepository.findByAuthorId(userId);
+            return UserDto.builder().email(user.getEmail()).posts(userPosts).role(user.getRole()).username(user.getUsername()).build();
+        } catch (Exception e) {
+            log.error("Failed to get profile for user with ID:" + userId + " " + e.getMessage());
+            throw new UserException("Failed to get profile for user with ID " + userId, e.getMessage());
+        }
     }
 
     @Override
     public User editProfile(Long userId, User user) {
-        User userToEdit = userRepository.findById(userId).orElseThrow(() -> new UserException("User with the given id could not be found", "USER_NOT_FOUND"));
-        userToEdit.setEmail(user.getEmail());
-        userToEdit.setPassword(user.getPassword());
-        userToEdit.setPassword(user.getPassword());
-
-        return userRepository.save(userToEdit);
-
+        try {
+            User userToEdit = userRepository.findById(userId).orElseThrow(() -> new UserException("User with the given ID could not be found", "USER_NOT_FOUND"));
+            userToEdit.setEmail(user.getEmail());
+            userToEdit.setPassword(user.getPassword());
+            userToEdit.setPassword(user.getPassword());
+            return userRepository.save(userToEdit);
+        } catch (Exception e) {
+            log.error("Failed to edit profile for user with ID: " + userId + e.getMessage());
+            throw new UserException("Failed to edit profile for user with ID " + userId, e.getMessage());
+        }
     }
 
     @Override
     public String deleteProfile(Long userId) {
-        User userToDelete = userRepository.findById(userId).orElseThrow(() -> new UserException("User with the given id could not be found", "USER_NOT_FOUND"));
-        userRepository.delete(userToDelete);
-        return "User deleted Successfully";
+        try {
+            User userToDelete = userRepository.findById(userId).orElseThrow(() -> new UserException("User with the given ID could not be found", "USER_NOT_FOUND"));
+            userRepository.delete(userToDelete);
+            return "User deleted successfully";
+        } catch (Exception e) {
+            log.error("Failed to delete profile for user with ID: " + userId + e.getMessage());
+            throw new UserException("Failed to delete profile for user with ID " + userId, e.getMessage());
+        }
     }
 }

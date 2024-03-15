@@ -2,9 +2,9 @@ package com.blog_api.blog_api.controller;
 
 import com.blog_api.blog_api.dto.CommentNotFoundResponse;
 import com.blog_api.blog_api.entity.Comment;
+import com.blog_api.blog_api.exception.CommentException;
 import com.blog_api.blog_api.exception.CommentNotFoundException;
 import com.blog_api.blog_api.service.CommentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,17 +23,24 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-
     @PostMapping
     public ResponseEntity<Comment> createComment(@PathVariable("postId") Long postId, @RequestBody Comment comment) {
-        Comment createComment = commentService.createComment(postId, comment);
-        return new ResponseEntity<>(createComment, HttpStatus.CREATED);
+        try {
+            Comment createComment = commentService.createComment(postId, comment);
+            return new ResponseEntity<>(createComment, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<Comment>> getAllPosts(@PathVariable Long postId) {
-        List<Comment> comments = commentService.getAllComments(postId);
-        return new ResponseEntity<>(comments, HttpStatus.OK);
+        try {
+            List<Comment> comments = commentService.getAllComments(postId);
+            return new ResponseEntity<>(comments, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
@@ -41,25 +48,34 @@ public class CommentController {
         try {
             Optional<Comment> comment = commentService.findById(postId, commentId);
             return new ResponseEntity<>(comment, HttpStatus.OK);
-        } catch (CommentNotFoundException e) {
+        } catch (CommentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CommentNotFoundResponse("Comment not found", postId, commentId));
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Boolean>> deleteComment(@PathVariable("postId") long postId, @PathVariable("id") long commentId) {
-        commentService.deleteComment(postId, commentId);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("Deleted", true);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<?> deleteComment(@PathVariable("postId") long postId, @PathVariable("id") long commentId) {
+        try {
+            commentService.deleteComment(postId, commentId);
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("Deleted", true);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (CommentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CommentNotFoundResponse("Comment not found", postId, commentId));
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Comment> editComment(@PathVariable("postId") long postId, @PathVariable("id") long commentId, @RequestBody Comment comment) {
+    public ResponseEntity<?> editComment(@PathVariable("postId") long postId, @PathVariable("id") long commentId, @RequestBody Comment comment) {
         try {
             Comment updateComment = commentService.editComment(postId, commentId, comment);
             return new ResponseEntity<>(updateComment, HttpStatus.OK);
+        } catch (CommentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CommentNotFoundResponse("Comment not found", postId, commentId));
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
