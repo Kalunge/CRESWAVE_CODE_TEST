@@ -1,10 +1,7 @@
 package com.blog_api.blog_api.controller;
 
-import com.blog_api.blog_api.dto.CommentDto;
 import com.blog_api.blog_api.dto.CommentNotFoundResponse;
 import com.blog_api.blog_api.entity.Comment;
-import com.blog_api.blog_api.entity.Post;
-import com.blog_api.blog_api.exception.CommentException;
 import com.blog_api.blog_api.exception.CommentNotFoundException;
 import com.blog_api.blog_api.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +17,12 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/posts/{postId}/comments")
 public class CommentController {
-    @Autowired
-    private CommentService commentService;
+    private final CommentService commentService;
+
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
+
 
     @PostMapping
     public ResponseEntity<Comment> createComment(@PathVariable("postId") Long postId, @RequestBody Comment comment) {
