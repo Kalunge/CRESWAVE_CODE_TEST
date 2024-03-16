@@ -1,7 +1,10 @@
 package com.blog_api.blog_api.service.implementation;
 
 import com.blog_api.blog_api.entity.Post;
+import com.blog_api.blog_api.exception.CommentException;
+import com.blog_api.blog_api.exception.CommentNotFoundException;
 import com.blog_api.blog_api.exception.PostException;
+import com.blog_api.blog_api.exception.PostNotFoundException;
 import com.blog_api.blog_api.repository.PostRepository;
 import com.blog_api.blog_api.service.PostService;
 import lombok.extern.log4j.Log4j;
@@ -54,7 +57,9 @@ public class PostServiceImplementation implements PostService {
     public Post findById(Long postId) {
         try {
             log.info("Getting the post for postId: " + postId);
-            return postRepository.findById(postId).orElseThrow(() -> new PostException("Post with the given ID could not be found", "POST_NOT_FOUND"));
+            return postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Post with the given ID could not be found", "POST_NOT_FOUND"));
+        } catch (PostNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Failed to find post with ID: " + postId + e.getMessage());
             throw new PostException("Failed to find post with ID " + postId, e.getMessage());

@@ -1,9 +1,12 @@
 package com.blog_api.blog_api.controller;
 
+import com.blog_api.blog_api.dto.CommentNotFoundResponse;
 import com.blog_api.blog_api.dto.PostNotFoundResponse;
 import com.blog_api.blog_api.entity.Post;
 import com.blog_api.blog_api.exception.PostException;
+import com.blog_api.blog_api.exception.PostNotFoundException;
 import com.blog_api.blog_api.service.PostService;
+import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/posts")
+@Log4j
 public class PostController {
 
     private final PostService postService;
@@ -47,9 +51,11 @@ public class PostController {
         try {
             Post post = postService.findById(postId);
             return new ResponseEntity<>(post, HttpStatus.OK);
-        } catch (PostException e) {
+        } catch (PostNotFoundException e) {
+            log.error("in this catch block");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new PostNotFoundResponse("Post not found", postId));
         } catch (Exception e) {
+            log.error("in general exception block");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
