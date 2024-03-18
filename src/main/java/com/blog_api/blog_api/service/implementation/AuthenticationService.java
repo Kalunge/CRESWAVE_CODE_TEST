@@ -30,13 +30,20 @@ public class AuthenticationService implements UserDetailsService {
         return user;
     }
 
-    public UserDetails signUp(SignUpDto data) throws InvalidJwtException {
+    public User signUp(SignUpDto data) throws InvalidJwtException {
         if (userRepository.findByUsername(data.getUsername()) != null) {
             throw new InvalidJwtException("Username already exists");
         }
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.getPassword());
         User newUser = new User(data.getUsername(), encryptedPassword, data.getRole(), data.getEmail());
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
+
+        return User.builder()
+                .id(newUser.getId())
+                .email(newUser.getEmail())
+                .username(newUser.getUsername())
+                .role(newUser.getRole())
+                .build();
     }
 
 }
