@@ -3,7 +3,6 @@ package com.blog_api.blog_api.controller;
 import com.blog_api.blog_api.dto.CommentNotFoundResponse;
 import com.blog_api.blog_api.entity.Comment;
 import com.blog_api.blog_api.exception.CommentException;
-import com.blog_api.blog_api.exception.CommentNotFoundException;
 import com.blog_api.blog_api.service.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
