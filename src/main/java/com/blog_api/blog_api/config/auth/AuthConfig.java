@@ -23,7 +23,14 @@ public class AuthConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.csrf(csrf -> csrf.disable()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.POST, "/api/v1/auth/*").permitAll().requestMatchers(HttpMethod.POST, "/api/v1/books").hasRole("ADMIN").anyRequest().authenticated()).addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
+        return httpSecurity.csrf(csrf -> csrf.disable()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/*").permitAll()
+                 .requestMatchers(HttpMethod.GET, "/api/v1/users").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/users")
+                .hasRole("ADMIN").anyRequest()
+                .authenticated())
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean

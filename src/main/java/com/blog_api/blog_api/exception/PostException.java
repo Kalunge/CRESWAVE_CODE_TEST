@@ -1,7 +1,5 @@
 package com.blog_api.blog_api.exception;
 
-import lombok.Data;
-
 public class PostException extends RuntimeException {
 
     private String errorCode;

@@ -1,9 +1,7 @@
 package com.blog_api.blog_api.service.implementation;
 
-import com.blog_api.blog_api.dto.CommentDto;
 import com.blog_api.blog_api.entity.Comment;
 import com.blog_api.blog_api.entity.Post;
-import com.blog_api.blog_api.entity.User;
 import com.blog_api.blog_api.exception.CommentException;
 import com.blog_api.blog_api.exception.CommentNotFoundException;
 import com.blog_api.blog_api.exception.PostException;

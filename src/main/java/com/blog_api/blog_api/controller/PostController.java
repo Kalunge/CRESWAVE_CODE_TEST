@@ -1,6 +1,5 @@
 package com.blog_api.blog_api.controller;
 
-import com.blog_api.blog_api.dto.CommentNotFoundResponse;
 import com.blog_api.blog_api.dto.PostNotFoundResponse;
 import com.blog_api.blog_api.entity.Post;
 import com.blog_api.blog_api.exception.PostException;
