@@ -1,12 +1,11 @@
 package com.blog_api.blog_api.dto;
 
-
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class SignUpRequest {
+@Builder
+public class SignInDto {
     private String username;
     private String password;
-    private String email;
-    private String role;
 }

@@ -1,6 +1,6 @@
 package com.blog_api.blog_api.service;
 
-import com.blog_api.blog_api.dto.LoginRequest;
+import com.blog_api.blog_api.dto.SignInDto;
 import com.blog_api.blog_api.dto.LoginResponse;
 import com.blog_api.blog_api.dto.UserDto;
 import com.blog_api.blog_api.entity.User;
@@ -16,7 +16,7 @@ public interface UserService {
     User register(User user);
 
     //  TODO   POST /api/users/login
-    LoginResponse login(LoginRequest request);
+    LoginResponse login(SignInDto request);
 
     //  TODO   GET /api/users/profile
     UserDto getProfile(Long userId);

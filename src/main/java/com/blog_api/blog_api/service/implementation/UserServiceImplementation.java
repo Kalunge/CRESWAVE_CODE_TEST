@@ -1,6 +1,6 @@
 package com.blog_api.blog_api.service.implementation;
 
-import com.blog_api.blog_api.dto.LoginRequest;
+import com.blog_api.blog_api.dto.SignInDto;
 import com.blog_api.blog_api.dto.LoginResponse;
 import com.blog_api.blog_api.dto.UserDto;
 import com.blog_api.blog_api.entity.Post;
@@ -47,7 +47,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponse login(SignInDto request) {
         String token = "Random token";
         LoginResponse response = LoginResponse.builder().token(token).build();
         return response;
