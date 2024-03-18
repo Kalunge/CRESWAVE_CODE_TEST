@@ -1,7 +1,6 @@
 package com.blog_api.blog_api.dto;
 
 import com.blog_api.blog_api.entity.Comment;
-
 import lombok.Builder;
 import lombok.Data;
 

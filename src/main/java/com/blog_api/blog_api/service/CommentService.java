@@ -1,6 +1,5 @@
 package com.blog_api.blog_api.service;
 
-import com.blog_api.blog_api.dto.CommentDto;
 import com.blog_api.blog_api.entity.Comment;
 
 import java.util.List;

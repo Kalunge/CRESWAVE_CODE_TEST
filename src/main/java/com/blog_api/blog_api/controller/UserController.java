@@ -1,9 +1,8 @@
 package com.blog_api.blog_api.controller;
 
-import com.blog_api.blog_api.dto.LoginRequest;
 import com.blog_api.blog_api.dto.LoginResponse;
+import com.blog_api.blog_api.dto.SignInDto;
 import com.blog_api.blog_api.dto.UserDto;
-import com.blog_api.blog_api.entity.Post;
 import com.blog_api.blog_api.entity.User;
 import com.blog_api.blog_api.service.UserService;
 import lombok.extern.log4j.Log4j;
@@ -51,7 +50,7 @@ public class UserController {
 //  TODO   POST /api/users/login
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(SignInDto loginRequest) {
         try {
             LoginResponse response = userService.login(loginRequest);
             return new ResponseEntity<>(response, HttpStatus.OK);

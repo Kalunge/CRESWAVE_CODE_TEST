@@ -1,10 +1,10 @@
 package com.blog_api.blog_api.exception;
 
-public class PostException extends RuntimeException {
+public class AuthException extends RuntimeException {
 
     private String errorCode;
 
-    public PostException(String message, String errorCode) {
+    public AuthException(String message, String errorCode) {
         super(message);
         this.errorCode = errorCode;
     }

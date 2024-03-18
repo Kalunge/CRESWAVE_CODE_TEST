@@ -1,14 +1,18 @@
 package com.blog_api.blog_api.controller;
 
-import com.blog_api.blog_api.dto.CommentNotFoundResponse;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.blog_api.blog_api.dto.PostNotFoundResponse;
 import com.blog_api.blog_api.entity.Post;
+import com.blog_api.blog_api.exception.ForbiddenException;
 import com.blog_api.blog_api.exception.PostException;
 import com.blog_api.blog_api.exception.PostNotFoundException;
+import com.blog_api.blog_api.exception.UnauthorizedException;
 import com.blog_api.blog_api.service.PostService;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -28,10 +32,15 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
+        if (userIsAuthenticated()) {
+            throw new UnauthorizedException("You must be logged in");
+        }
+
         try {
             Post createPost = postService.save(post);
             return new ResponseEntity<>(createPost, HttpStatus.CREATED);
         } catch (Exception e) {
+            log.error(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -52,7 +61,7 @@ public class PostController {
             Post post = postService.findById(postId);
             return new ResponseEntity<>(post, HttpStatus.OK);
         } catch (PostNotFoundException e) {
-            log.error("in this catch block");
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new PostNotFoundResponse("Post not found", postId));
         } catch (Exception e) {
             log.error("in general exception block");
@@ -62,6 +71,10 @@ public class PostController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePost(@PathVariable("id") long postId) {
+
+        if (userHasPermission()) {
+            throw new ForbiddenException("You do not have permission to access this resource, you must be an admin");
+        }
         try {
             postService.deletePost(postId);
             Map<String, Boolean> response = new HashMap<>();
@@ -76,13 +89,31 @@ public class PostController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> editPost(@PathVariable("id") long postId, @RequestBody Post post) {
+        if (userHasPermission()) {
+            throw new ForbiddenException("You do not have permission to access this resource, you must be an admin");
+        }
         try {
             Post updatePost = postService.editPost(postId, post);
             return new ResponseEntity<>(updatePost, HttpStatus.OK);
         } catch (PostException e) {
+            log.error(e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new PostNotFoundResponse("Post not found", postId));
         } catch (Exception e) {
+            log.error(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    private boolean userHasPermission() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication == null || authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    private boolean userIsAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication == null ||
+                authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN")) ||
+                authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_USER"));
+    }
+
 }

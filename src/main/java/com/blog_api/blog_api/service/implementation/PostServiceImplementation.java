@@ -1,14 +1,11 @@
 package com.blog_api.blog_api.service.implementation;
 
 import com.blog_api.blog_api.entity.Post;
-import com.blog_api.blog_api.exception.CommentException;
-import com.blog_api.blog_api.exception.CommentNotFoundException;
 import com.blog_api.blog_api.exception.PostException;
 import com.blog_api.blog_api.exception.PostNotFoundException;
 import com.blog_api.blog_api.repository.PostRepository;
 import com.blog_api.blog_api.service.PostService;
 import lombok.extern.log4j.Log4j;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
