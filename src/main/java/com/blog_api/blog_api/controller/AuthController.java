@@ -5,12 +5,16 @@ import com.blog_api.blog_api.dto.JwtDto;
 import com.blog_api.blog_api.dto.SignInDto;
 import com.blog_api.blog_api.dto.SignUpDto;
 import com.blog_api.blog_api.entity.User;
+import com.blog_api.blog_api.exception.AuthException;
+import com.blog_api.blog_api.exception.InvalidJwtException;
 import com.blog_api.blog_api.service.implementation.AuthenticationService;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
@@ -23,33 +27,48 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 @Log4j
 public class AuthController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private AuthenticationService authService;
+    private final AuthenticationService authService;
 
-    @Autowired
-    private TokenProvider tokenProvider;
+    private final TokenProvider tokenProvider;
+
+    public AuthController(AuthenticationManager authenticationManager, AuthenticationService authService, TokenProvider tokenProvider) {
+        this.authenticationManager = authenticationManager;
+        this.authService = authService;
+        this.tokenProvider = tokenProvider;
+    }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserDetails> signUp(@RequestBody @Validated SignUpDto data) {
-        UserDetails details = authService.signUp(data);
-        return new ResponseEntity<>(details, HttpStatus.CREATED);
+    public ResponseEntity<?> signUp(@RequestBody @Validated SignUpDto data) {
+        try {
+            UserDetails details = authService.signUp(data);
+            return new ResponseEntity<>(details, HttpStatus.CREATED);
+        } catch (InvalidJwtException e) {
+            log.error(e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email must be unique, please try again");
+        } catch (Exception e) {
+            log.error(e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Something went wrong please try again later");
+        }
 
-//        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<JwtDto> signIn(@RequestBody @Validated SignInDto data) {
+    public ResponseEntity<?> signIn(@RequestBody @Validated SignInDto data) {
         try {
             var usernamePassword = new UsernamePasswordAuthenticationToken(data.getUsername(), data.getPassword());
             var authUser = authenticationManager.authenticate(usernamePassword);
             var accessToken = tokenProvider.generateAccessToken((User) authUser.getPrincipal());
             return ResponseEntity.ok(new JwtDto(accessToken));
+        } catch (BadCredentialsException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong Username and/or password, please try again");
         } catch (Exception e) {
-            log.error("Some error here: " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Something went wrong please try again later");
         }
     }
 
