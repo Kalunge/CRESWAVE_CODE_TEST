@@ -8,6 +8,9 @@ import com.blog_api.blog_api.service.PostService;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 @Service
@@ -85,5 +88,10 @@ public class PostServiceImplementation implements PostService {
             log.error("Failed to edit post with ID: " + postId + " " + e.getMessage());
             throw new PostException("Failed to edit post with ID " + postId, e.getMessage());
         }
+    }
+
+    @Override
+    public Page<Post> searchAndSortPosts(String keyword, Pageable pageable) {
+        return postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(keyword, keyword, pageable);
     }
 }
